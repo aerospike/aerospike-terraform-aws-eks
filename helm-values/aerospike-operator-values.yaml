@@ -1,0 +1,2 @@
+nodeSelector:
+  NodeGroupType: ${node_group_type}
