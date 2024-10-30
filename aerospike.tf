@@ -82,7 +82,7 @@ locals {
   }
 }
 
-resource "kubernetes_namespace" "aerospike_namespace" {
+resource "kubernetes_namespace" "aerospike" {
   metadata {
     name = local.aerospike_namespace
   }
@@ -186,3 +186,49 @@ resource "helm_release" "aerospike_cluster" {
   ]
 }
 
+# Create the ServiceAccount
+resource "kubernetes_service_account" "aerospike_operator_controller_manager" {
+  metadata {
+    name      = "aerospike-operator-controller-manager"
+    namespace = local.aerospike_namespace
+  }
+}
+
+# Create the RoleBinding
+resource "kubernetes_role_binding" "aerospike_cluster" {
+  metadata {
+    name      = "aerospike-cluster"
+    namespace = local.aerospike_namespace
+  }
+
+  role_ref {
+    api_group = "rbac.authorization.k8s.io"
+    kind      = "ClusterRole"
+    name      = "aerospike-cluster"
+  }
+
+  subject {
+    kind      = "ServiceAccount"
+    name      = kubernetes_service_account.aerospike_operator_controller_manager.metadata[0].name
+    namespace = local.aerospike_namespace
+  }
+}
+
+# Create the ClusterRoleBinding
+resource "kubernetes_cluster_role_binding" "aerospike_cluster" {
+  metadata {
+    name = "aerospike-cluster"
+  }
+
+  role_ref {
+    api_group = "rbac.authorization.k8s.io"
+    kind      = "ClusterRole"
+    name      = "aerospike-cluster"
+  }
+
+  subject {
+    kind      = "ServiceAccount"
+    name      = kubernetes_service_account.aerospike_operator_controller_manager.metadata[0].name
+    namespace = local.aerospike_namespace
+  }
+}
