@@ -4,7 +4,7 @@ replicas: 3
 ## Aerospike Database Docker image
 image:
   repository: aerospike/aerospike-server-enterprise
-  tag: 7.1.0.0
+  tag: 7.2.0.3
 
 ## Aerospike access control configuration
 aerospikeAccessControl:
@@ -14,6 +14,7 @@ aerospikeAccessControl:
       roles:
         - sys-admin
         - user-admin
+        - read-write
 
 ## Aerospike Configuration
 aerospikeConfig:
@@ -61,6 +62,7 @@ storage:
     initMethod: deleteFiles
   blockVolumePolicy:
     cascadeDelete: true
+    initMethod: dd
   volumes:
     - name: workdir
       aerospike:

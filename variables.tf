@@ -19,7 +19,7 @@ variable "eks_cluster_version" {
 variable "aerospike_operator_version" {
   description = "Aerospike Kubernetes Operator version"
   type        = string
-  default     = "3.3.1"
+  default     = "3.4.0"
 }
 
 variable "vpc_cidr" {
