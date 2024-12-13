@@ -4,7 +4,7 @@ metadata:
   name: default
 spec:
   amiSelectorTerms: 
-  - alias: al2@latest
+  - alias: bottlerocket@latest
   subnetSelectorTerms:          
     - tags:
         karpenter.sh/discovery: "--CLUSTER_NAME--"

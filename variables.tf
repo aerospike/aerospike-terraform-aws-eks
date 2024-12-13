@@ -13,7 +13,13 @@ variable "name" {
 variable "eks_cluster_version" {
   description = "EKS Cluster version"
   type        = string
-  default     = "1.30"
+  default     = "1.31"
+}
+
+variable "karpenter_version" {
+  description = "Karpenter version"
+  type        = string
+  default     = "1.1.0"
 }
 
 variable "aerospike_operator_version" {
