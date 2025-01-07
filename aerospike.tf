@@ -90,22 +90,6 @@ resource "kubernetes_namespace" "aerospike" {
   depends_on = [module.eks.cluster_name]
 }
 
-resource "kubernetes_secret" "aerospike_secret" {
-  metadata {
-    name      = "aerospike-secret"
-    namespace = local.aerospike_namespace
-  }
-
-  data = {
-    for file in fileset("${path.module}/examples/secrets", "*") :
-    basename(file) => filebase64("${path.module}/examples/secrets/${file}")
-  }
-
-  type = "Opaque"
-
-  depends_on = [helm_release.aerospike_operator]
-}
-
 resource "kubernetes_secret" "auth_secret" {
   metadata {
     name      = "auth-secret"

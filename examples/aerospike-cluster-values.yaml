@@ -48,7 +48,7 @@ aerospikeNetworkPolicy: {}
 
 ## Pod spec
 podSpec:
-   multiPodPerHost: true
+   multiPodPerHost: false
 
 ## Rack configuration
 rackConfig:
