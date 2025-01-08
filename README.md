@@ -88,6 +88,8 @@ podSpec:
     NodeGroupType: ${node_group_type}
 ```
 
+We're using the `multiPodPerHost: false` configuration to say that we want Aerospike cluster pods to be spread within nodes. This will cause to have unscheduled pods, and Karpenter will pick them up and will create a node per pod. This is recommended to reduce the blast radius of doing maintenance operations in a live environment.
+
 Notice that the pods are requesting a node with the `NodeGroupType` selector, which will match the Aerospike NodePool in Karpenter. Karpenter NodePools define how Karpenter manages unschedulable pods and configures nodes. Although most use cases are addressed with a single NodePool for multiple workloads/teams, multiple NodePools are useful to isolate nodes for billing, use different node constraints (such as no GPUs for a team), or use different disruption settings.
 
 In this case, the NodePools the blueprint is creating have the constraint to only use Graviton instances as they've been prove to provide a better performance to run Aerospike clusters. You don't need to build a differnt Aerospike container image for this as we already have support for arm-based container images. Here's a portion of the NodePool constraints that launch only Graviton instances for certain families:
