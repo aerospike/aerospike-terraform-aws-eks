@@ -77,7 +77,7 @@ resource "helm_release" "aerospike_operator" {
 locals {
   aerospike_cluster_helm_config = {
     values = [templatefile("${path.module}/examples/aerospike-cluster-values.yaml", {
-      node_group_type = "apps"
+      node_group_type = "aerospike"
     })]
   }
 }
@@ -165,7 +165,6 @@ resource "helm_release" "aerospike_cluster" {
   }
 
   depends_on = [
-    kubernetes_secret.aerospike_secret,
     kubernetes_secret.auth_secret
   ]
 }

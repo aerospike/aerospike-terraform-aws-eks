@@ -48,7 +48,9 @@ aerospikeNetworkPolicy: {}
 
 ## Pod spec
 podSpec:
-   multiPodPerHost: false
+  multiPodPerHost: false
+  nodeSelector:
+    NodeGroupType: ${node_group_type}
 
 ## Rack configuration
 rackConfig:
@@ -100,6 +102,3 @@ operatorClientCert: {}
 
 ## Dev Mode
 devMode: false
-
-nodeSelector:
-  NodeGroupType: ${node_group_type}
