@@ -1,6 +1,14 @@
 # Aerospike on EKS using Terraform
 
-Aerospike is a high-performance, scalable, real-time NoSQL database that delivers sub-millisecond latency at petabyte scale. It is designed to handle massive amounts of data with extreme efficiency, making it ideal for use cases that require rapid data processing and real-time decision making. This repository provides a blueprint to deploy Aerospike to an Amazon Elastic Kubernetes Service (EKS) cluster using Terraform, following the pattern established by the Data on EKS (DoEKS) project. By leveraging the power of Kubernetes and the flexibility of Terraform, this deployment method allows for efficient management and scaling of Aerospike instances in a cloud-native environment. The blueprint covers aspects such as cluster configuration, storage optimization, networking, and security, enabling you to quickly set up a production-ready Aerospike environment on EKS.
+Aerospike is a high-performance, scalable, real-time NoSQL database that delivers sub-millisecond latency at petabyte scale. It is designed to handle massive amounts of data with extreme efficiency, making it ideal for use cases that require rapid data processing and real-time decision making. This repository provides a blueprint to deploy `Aerospike Database Enterprise Edition` to an Amazon Elastic Kubernetes Service (EKS) cluster using Terraform, following the pattern established by the Data on EKS (DoEKS) project. By leveraging the power of Kubernetes and the flexibility of Terraform, this deployment method allows for efficient management and scaling of Aerospike instances in a cloud-native environment. The blueprint covers aspects such as aerospike cluster configuration, storage optimization, networking, and security, enabling you to quickly set up a production-ready Aerospike environment on EKS.
+
+# Pre-Requisites
+
+Ensure that you have installed the following tools on your machine.
+
+* [aws cli](https://docs.aws.amazon.com/cli/latest/userguide/install-cliv2.html)
+* [kubectl](https://kubernetes.io/docs/tasks/tools/)
+* [terraform](https://learn.hashicorp.com/tutorials/terraform/install-cli)
 
 # Deploy
 
@@ -18,7 +26,9 @@ chmod +x install.sh
 ./install.sh
 ```
 
-This will take around 20 to 25 minutes. When it's done, you need to create the `aerospike-secret` that the blueprint is using to access the `features.conf` file to validate your Aerospike license. So, make sure you have a valid `features.conf` file, put it in the `examples/secrets` folder (the repository is ignoring this file), and run the following command:
+The script will deploy all the resources using Terraform. The Terraform template creates an EKS cluster with the AKO controller, along with an Aerospike cluster.
+
+This will take around 20 to 25 minutes. When it's done, you need to create the `aerospike-secret` that the blueprint is using to access the [`features.conf`](https://aerospike.com/docs/server/operations/configure/feature-key) file to validate your Aerospike license. So, make sure you have a valid `features.conf` file, put it in the `examples/secrets` folder (the repository is ignoring this file), and run the following command:
 
 ```
 kubectl create secret generic aerospike-secret --from-file=examples/secrets -n aerospike
@@ -79,7 +89,7 @@ Admin>
 
 First of all, the blueprint is using Karpenter to provision the compute nodes for the EKS cluster. Karpenter is a node lifecycle management solution used to scale your Kubernetes cluster. Karpenter observes incoming pods and launches the right-sized Amazon EC2 instances based on your workloads' requirements. Instance selection decisions are intent-based and driven by the specification of incoming pods, including resource requests and Kubernetes scheduling constraints.
 
-When the Aerospike cluster is created, there are unscheduled pods as none of the existing nodes have a label `NodeGroupType: aerospike`. Therefor, Karpenter will launch the node(s) needed based on the pod's constraints. In this case, if you look at the `examples/aerospike-cluster-values.yaml` file, the Aerospike pods have the following constraints:
+When the Aerospike cluster is created, there are unscheduled pods as none of the existing nodes have a label `NodeGroupType: aerospike`. Therefore, Karpenter will launch the node(s) needed based on the pod's constraints. In this case, if you look at the `examples/aerospike-cluster-values.yaml` file, the Aerospike pods have the following constraints:
 
 ```
 podSpec:
@@ -92,7 +102,7 @@ We're using the `multiPodPerHost: false` configuration to say that we want Aeros
 
 Notice that the pods are requesting a node with the `NodeGroupType` selector, which will match the Aerospike NodePool in Karpenter. Karpenter NodePools define how Karpenter manages unschedulable pods and configures nodes. Although most use cases are addressed with a single NodePool for multiple workloads/teams, multiple NodePools are useful to isolate nodes for billing, use different node constraints (such as no GPUs for a team), or use different disruption settings.
 
-In this case, the NodePools the blueprint is creating have the constraint to only use Graviton instances as they've been prove to provide a better performance to run Aerospike clusters. You don't need to build a differnt Aerospike container image for this as we already have support for arm-based container images. Here's a portion of the NodePool constraints that launch only Graviton instances for certain families:
+In this case, the NodePools the blueprint is creating have the constraint to only use Graviton instances as they've been proven to provide a better performance to run Aerospike clusters. You don't need to build a different Aerospike container image for this as we already have support for arm-based container images. Here's a portion of the NodePool constraints that launch only Graviton instances for certain families:
 
 ```
       requirements:

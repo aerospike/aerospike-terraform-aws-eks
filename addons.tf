@@ -17,7 +17,7 @@ resource "kubernetes_annotations" "gp2_default" {
 
 resource "kubernetes_storage_class" "ebs_csi_encrypted_gp3_storage_class" {
   metadata {
-    name = "gp3"
+    name = "ssd"
     annotations = {
       "storageclass.kubernetes.io/is-default-class" : "true"
     }
@@ -83,18 +83,6 @@ module "eks_blueprints_addons" {
     kube-proxy = {
       preserve = true
     }
-  }
-
-  #---------------------------------------
-  # Metrics Server
-  #---------------------------------------
-  enable_metrics_server = true
-  metrics_server = {
-    timeout = "300"
-    values = [templatefile("${path.module}/helm-values/metrics-server-values.yaml", {
-      operating_system = "linux"
-      node_group_type  = "core"
-    })]
   }
 
   #---------------------------------------

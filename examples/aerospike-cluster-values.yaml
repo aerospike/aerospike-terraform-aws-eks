@@ -43,19 +43,11 @@ aerospikeConfig:
         type: memory
         data-size: 1073741824
 
-## Network policy
-aerospikeNetworkPolicy: {}
-
 ## Pod spec
 podSpec:
   multiPodPerHost: false
   nodeSelector:
     NodeGroupType: ${node_group_type}
-
-## Rack configuration
-rackConfig:
-  namespaces:
-    - test
 
 ## Storage configuration
 storage:
@@ -88,17 +80,3 @@ storage:
           secretName: aerospike-secret
       aerospike:
         path: /etc/aerospike/secret
-
-## Validation policy
-validationPolicy:
-   skipWorkDirValidate: false
-   skipXdrDlogFileValidate: false
-
-## seedsFinderServices defines service (e.g. loadbalancer) to connect to Aerospike
-seedsFinderServices: {}
-
-## operatorClientCert defines certificates to connect to Aerospike
-operatorClientCert: {}
-
-## Dev Mode
-devMode: false

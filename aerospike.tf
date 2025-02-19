@@ -1,5 +1,5 @@
 #---------------------------------------------------------------
-# Aerospike Kubernetes Operator
+# Install Aerospike Kubernetes Operator
 #---------------------------------------------------------------
 
 locals {
