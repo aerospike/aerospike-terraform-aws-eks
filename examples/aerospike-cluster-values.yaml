@@ -1,0 +1,82 @@
+## Aerospike cluster size
+replicas: 3
+
+## Aerospike Database Docker image
+image:
+  repository: aerospike/aerospike-server-enterprise
+  tag: 7.2.0.3
+
+## Aerospike access control configuration
+aerospikeAccessControl:
+  users:
+    - name: admin
+      secretName: auth-secret
+      roles:
+        - sys-admin
+        - user-admin
+        - read-write
+
+## Aerospike Configuration
+aerospikeConfig:
+  service:
+    feature-key-file: /etc/aerospike/secret/features.conf
+  security: {}
+
+  network:
+    service:
+      port: 3000
+    heartbeat:
+      port: 3002
+    fabric:
+      port: 3001
+
+  namespaces:
+    - name: test
+      replication-factor: 2
+      storage-engine:
+        type: device
+        devices:
+          - /test/dev/xvdf
+    - name: testMem
+      replication-factor: 1
+      storage-engine:
+        type: memory
+        data-size: 1073741824
+
+## Pod spec
+podSpec:
+  multiPodPerHost: false
+  nodeSelector:
+    NodeGroupType: ${node_group_type}
+
+## Storage configuration
+storage:
+  filesystemVolumePolicy:
+    cascadeDelete: true
+    initMethod: deleteFiles
+  blockVolumePolicy:
+    cascadeDelete: true
+    initMethod: dd
+  volumes:
+    - name: workdir
+      aerospike:
+        path: /opt/aerospike
+      source:
+        persistentVolume:
+          storageClass: gp3
+          volumeMode: Filesystem
+          size: 1Gi
+    - name: ns
+      aerospike:
+        path: /test/dev/xvdf
+      source:
+        persistentVolume:
+          storageClass: gp3
+          volumeMode: Block
+          size: 5Gi
+    - name: aerospike-config-secret
+      source:
+        secret:
+          secretName: aerospike-secret
+      aerospike:
+        path: /etc/aerospike/secret
