@@ -17,7 +17,7 @@ resource "kubernetes_annotations" "gp2_default" {
 
 resource "kubernetes_storage_class" "ebs_csi_encrypted_gp3_storage_class" {
   metadata {
-    name = "ssd"
+    name = "gp3"
     annotations = {
       "storageclass.kubernetes.io/is-default-class" : "true"
     }
