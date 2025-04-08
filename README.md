@@ -28,10 +28,10 @@ chmod +x install.sh
 
 The script will deploy all the resources using Terraform. The Terraform template creates an EKS cluster with the AKO controller, along with an Aerospike cluster.
 
-This will take around 20 to 25 minutes. When it's done, you need to create the `aerospike-secret` that the blueprint is using to access the [`features.conf`](https://aerospike.com/docs/server/operations/configure/feature-key) file to validate your Aerospike license. So, make sure you have a valid `features.conf` file, put it in the `examples/secrets` folder (the repository is ignoring this file), and run the following command:
+This will take around 20 to 25 minutes. When it's done, you need to create the `aerospike-secret` that the blueprint is using to access the [`features.conf`](https://aerospike.com/docs/server/operations/configure/feature-key) file to validate your Aerospike license. So, make sure you have a valid `features.conf` file, then run the following command:
 
 ```
-kubectl create secret generic aerospike-secret --from-file=examples/secrets -n aerospike
+kubectl create secret generic aerospike-secret --from-file=<path to features.conf> -n aerospike
 ```
 
 To confirm that the Aerospike cluster has been created, check the status of the pods running this command:
