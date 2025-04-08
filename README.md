@@ -1,16 +1,20 @@
 # Aerospike on EKS using Terraform
 
-Aerospike is a high-performance, scalable, real-time NoSQL database that delivers sub-millisecond latency at petabyte scale. It is designed to handle massive amounts of data with extreme efficiency, making it ideal for use cases that require rapid data processing and real-time decision making. This repository provides a blueprint to deploy `Aerospike Database Enterprise Edition` to an Amazon Elastic Kubernetes Service (EKS) cluster using Terraform, following the pattern established by the Data on EKS (DoEKS) project. By leveraging the power of Kubernetes and the flexibility of Terraform, this deployment method allows for efficient management and scaling of Aerospike instances in a cloud-native environment. The blueprint covers aspects such as aerospike cluster configuration, storage optimization, networking, and security, enabling you to quickly set up a production-ready Aerospike environment on EKS.
+Aerospike is a high-performance, scalable, real-time NoSQL database designed for ultra-low latency and petabyte-scale workloads. It’s ideal for use cases that demand fast data processing and real-time decision-making.
 
-# Pre-Requisites
+This repository provides a Terraform-based blueprint for deploying Aerospike Database Enterprise Edition on Amazon Elastic Kubernetes Service (EKS). It follows the conventions of the Data on EKS (DoEKS) project, combining Kubernetes orchestration with Terraform’s infrastructure-as-code approach for scalable, cloud-native deployments.
 
-Ensure that you have installed the following tools on your machine.
+The blueprint includes configuration for Aerospike clustering, storage optimization, networking, and security—enabling a production-ready deployment on AWS in under 30 minutes.
+
+# Prerequisites
+
+Ensure the following tools are installed locally:
 
 * [aws cli](https://docs.aws.amazon.com/cli/latest/userguide/install-cliv2.html)
 * [kubectl](https://kubernetes.io/docs/tasks/tools/)
 * [terraform](https://learn.hashicorp.com/tutorials/terraform/install-cli)
 
-# Deploy
+# Deployment Steps
 
 To deploy this blueprint into an AWS EKS cluster, you first need to clone the repository. To do so, run these commands:
 
@@ -55,7 +59,7 @@ If the pods are crashing, give it around five minutes for them to use the missin
 kubectl logs aerospikecluster-0-0 -c aerospike-server -n aerospike
 ```
 
-# Test
+# Testing the Deployment
 
 Once the Aerospike cluster is running, let's make sure it's working. To do so, let's create some environment variables to get one of the Aerospike host IPs, the user, and the password to connect to the server. Run these commands:
 
@@ -85,9 +89,9 @@ Online:  10.1.2.213:3000, 10.1.1.210:3000, 10.1.0.112:3000
 Admin>
 ```
 
-# Key Cluster Configurations
+# Key Cluster Configuration Details
 
-First of all, the blueprint is using Karpenter to provision the compute nodes for the EKS cluster. Karpenter is a node lifecycle management solution used to scale your Kubernetes cluster. Karpenter observes incoming pods and launches the right-sized Amazon EC2 instances based on your workloads' requirements. Instance selection decisions are intent-based and driven by the specification of incoming pods, including resource requests and Kubernetes scheduling constraints.
+This blueprint uses Karpenter for dynamic provisioning of EKS compute nodes. Karpenter launches right-sized EC2 instances based on pod requirements and scheduling constraints.
 
 When the Aerospike cluster is created, there are unscheduled pods as none of the existing nodes have a label `NodeGroupType: aerospike`. Therefore, Karpenter will launch the node(s) needed based on the pod's constraints. In this case, if you look at the `examples/aerospike-cluster-values.yaml` file, the Aerospike pods have the following constraints:
 
