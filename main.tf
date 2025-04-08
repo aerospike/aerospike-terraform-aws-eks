@@ -83,8 +83,8 @@ module "eks" {
       max_size     = 9
       desired_size = 3
 
-      instance_types = ["m6g.xlarge", "m6gd.xlarge", "m7g.xlarge", "c6g.xlarge", "c6gd.xlarge", "c7g.xlarge"]
-      ami_type       = "AL2_ARM_64"
+      instance_types = ["m8g.xlarge", "m7g.xlarge", "c8g.xlarge", "c7g.xlarge"]
+      ami_type       = "BOTTLEROCKET_ARM_64"
 
       ebs_optimized = true
       block_device_mappings = {
