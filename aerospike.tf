@@ -97,7 +97,23 @@ resource "kubernetes_secret" "auth_secret" {
   }
 
   data = {
-    password = "admin123"
+    password = var.aerospike_admin_password
+  }
+
+  type = "Opaque"
+
+  depends_on = [helm_release.aerospike_operator]
+}
+
+resource "kubernetes_secret" "aerospike_secret" {
+  metadata {
+    name      = "aerospike-secret"
+    namespace = local.aerospike_namespace
+  }
+
+  data = {
+    for file in fileset(var.aerospike_secret_files_path, "*") :
+    basename(file) => file("${var.aerospike_secret_files_path}/${file}")
   }
 
   type = "Opaque"

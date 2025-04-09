@@ -33,3 +33,14 @@ variable "vpc_cidr" {
   type        = string
   default     = "10.1.0.0/16"
 }
+
+variable "aerospike_admin_password" {
+  description = "password for aerospike admin user"
+  type        = string
+  sensitive   = true
+}
+
+variable "aerospike_secret_files_path" {
+  description = "path of aerospike secret files like feature.conf and tls certs"
+  type        = string
+}

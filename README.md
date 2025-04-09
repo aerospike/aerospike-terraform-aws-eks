@@ -12,6 +12,13 @@ Ensure that you have installed the following tools on your machine.
 
 # Deploy
 
+Before deploying, make sure to set following environment variables:
+
+```
+export TF_VAR_aerospike_admin_password=<password>
+export TF_VAR_aerospike_secret_files_path=<path to directory with features.conf and other cert files if any>
+```
+
 To deploy this blueprint into an AWS EKS cluster, you first need to clone the repository. To do so, run these commands:
 
 ```
