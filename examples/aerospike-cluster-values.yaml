@@ -1,10 +1,10 @@
 ## Aerospike cluster size
-replicas: 3
+replicas: 2
 
 ## Aerospike Database Docker image
 image:
   repository: aerospike/aerospike-server-enterprise
-  tag: 7.2.0.3
+  tag: 8.0.0.2
 
 ## Aerospike access control configuration
 aerospikeAccessControl:

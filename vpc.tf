@@ -1,5 +1,5 @@
-# WARNING: This VPC module includes the creation of an Internet Gateway and NAT Gateway, which simplifies cluster deployment and testing, primarily intended for sandbox accounts.
-# IMPORTANT: For preprod and prod use cases, it is crucial to consult with your security team and AWS architects to design a private infrastructure solution that aligns with your security requirements
+# WARNING: This VPC includes internet and NAT gateways, which are ideal for sandbox/test environments.
+# For production use, consider a fully private architecture, and consult your cloud security team.
 
 module "vpc" {
   source  = "terraform-aws-modules/vpc/aws"
@@ -8,17 +8,24 @@ module "vpc" {
   name = local.name
   cidr = local.vpc_cidr
 
-  azs             = local.azs
-  private_subnets = [for k, v in local.azs : cidrsubnet(local.vpc_cidr, 8, k)]
-  public_subnets  = [for k, v in local.azs : cidrsubnet(local.vpc_cidr, 8, k + 10)]
+  azs = local.azs
 
-  enable_nat_gateway = true
+  # Dynamically generate private subnets using subnetting logic
+  private_subnets = [for k, v in local.azs : cidrsubnet(local.vpc_cidr, 8, k)]
+  
+  # Public subnets use different offset to avoid overlap (k + 10)
+  public_subnets = [for k, v in local.azs : cidrsubnet(local.vpc_cidr, 8, k + 10)]
+
+  # Enable NAT gateway (1 per region, not per AZ) to allow private subnet internet access
+  enable_nat_gateway = var.enable_nat_gateway
   single_nat_gateway = true
 
+  # Tag public subnets to be discovered as ELB-compatible by Kubernetes
   public_subnet_tags = {
     "kubernetes.io/role/elb" = 1
   }
 
+  # Tag private subnets for internal ELBs and Karpenter node discovery
   private_subnet_tags = {
     "kubernetes.io/role/internal-elb" = 1
     "karpenter.sh/discovery"          = local.name
