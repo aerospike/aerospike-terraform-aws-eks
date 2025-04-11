@@ -15,14 +15,22 @@ Ensure the following tools are installed locally:
 * [terraform](https://learn.hashicorp.com/tutorials/terraform/install-cli)
 
 # Deployment Steps
+This blueprint is designed to deploy **Aerospike Database Enterprise Edition**. To proceed, make sure you have a valid [`features.conf`](https://aerospike.com/docs/server/operations/configure/feature-key) file, which is required to validate your Aerospike license.
 
-Before deploying, make sure to set following environment variables:
+## Prepare Secrets and Admin Credentials
+Put your features.conf file and any additional cert files into a single directory (e.g., ~/aerospike-secrets/).
+
+Then, set the following environment variables in your terminal:
 
 ```
-export TF_VAR_aerospike_admin_password=<password>
-export TF_VAR_aerospike_secret_files_path=<path to directory with features.conf and other cert files if any>
+export TF_VAR_aerospike_admin_password=<password-for-admin-user>
+export TF_VAR_aerospike_secret_files_path=<absolute-path-to-directory-containing-features.conf-and-certs>
 ```
+These environment variables are used by the blueprint to create two Kubernetes secrets:
+- **auth-secret**: Stores the password for the Aerospike `admin` user. This password is set in the Aerospike cluster and must be used by Aerospike clients to authenticate.
+- **aerospike-secret**: Stores the `features.conf and any other cert files` you’ve provided. These files are mounted into the Aerospike pods and used for license validation and secure configuration.
 
+## Clone the Blueprint Repository
 To deploy this blueprint into an AWS EKS cluster, you first need to clone the repository. To do so, run these commands:
 
 ```
@@ -30,20 +38,33 @@ git clone https://github.com/aerospike/aerospike-terraform-aws-eks.git
 cd aerospike-terraform-aws-eks
 ```
 
-Then, run the `install.sh` script, and enter the region name when prompted (i.e. `eu-west-1`):
+## Customizing the Blueprint Configuration (Optional)
+You can customize this blueprint by providing your own values in a `terraform.tfvars` file placed in the root of the repository.
+
+Terraform will automatically pick up this file when you run the `install.sh` script, no extra configuration is needed.
+
+Here’s a [sample terraform.tfvars](terraform.tfvars.example) you can use as a starting point. Rename this file to `terraform.tfvars` and update values before running the install script.
+
+## Run the Installation Script
+Make the install script executable and run it. Enter the region name when prompted (i.e. `eu-west-1`):
 
 ```
 chmod +x install.sh
 ./install.sh
 ```
 
-The script will deploy all the resources using Terraform. The Terraform template creates an EKS cluster with the AKO controller, along with an Aerospike cluster.
+The script will deploy all the resources using Terraform. The Terraform template creates an EKS cluster with the AKO controller, along with an Aerospike cluster. This will take around 20 to 25 minutes.
 
-This will take around 20 to 25 minutes. When it's done, you need to create the `aerospike-secret` that the blueprint is using to access the [`features.conf`](https://aerospike.com/docs/server/operations/configure/feature-key) file to validate your Aerospike license. So, make sure you have a valid `features.conf` file, then run the following command:
+## Connecting to the EKS cluster
+To connect to your Aerospike EKS cluster using kubectl, run the following command:
 
 ```
-kubectl create secret generic aerospike-secret --from-file=<path to features.conf> -n aerospike
+aws eks --region <your-region> update-kubeconfig --name <your-cluster-name>
 ```
+- Replace `<your-region>` with the region you deployed the cluster to (e.g., us-west-2).
+- Replace `<your-cluster-name>` with the value of the `name` variable defined in your variables.tf or *.auto.tfvars file.
+
+## Verify Aerospike Cluster Deployment
 
 To confirm that the Aerospike cluster has been created, check the status of the pods running this command:
 
@@ -60,7 +81,7 @@ aerospikecluster-0-1   1/1     Running   0          20m
 aerospikecluster-0-2   1/1     Running   0          20m
 ```
 
-If the pods are crashing, give it around five minutes for them to use the missing secret you created before. However, if for some reason they keep failing, check the logs of one of the pods by running this command:
+If the pods are crashing, check the logs of one of the pods by running this command:
 
 ```
 kubectl logs aerospikecluster-0-0 -c aerospike-server -n aerospike
@@ -109,7 +130,7 @@ podSpec:
     NodeGroupType: ${node_group_type}
 ```
 
-We're using the `multiPodPerHost: false` configuration to say that we want Aerospike cluster pods to be spread within nodes. This will cause to have unscheduled pods, and Karpenter will pick them up and will create a node per pod. This is recommended to reduce the blast radius of doing maintenance operations in a live environment.
+We’ve set `multiPodPerHost: false` to ensure that Aerospike cluster pods are spread across separate nodes. This may result in some pods initially remaining unscheduled, which Karpenter will detect and respond to by provisioning one node per pod. This configuration is recommended to minimize the blast radius during maintenance operations in a live environment.
 
 Notice that the pods are requesting a node with the `NodeGroupType` selector, which will match the Aerospike NodePool in Karpenter. Karpenter NodePools define how Karpenter manages unschedulable pods and configures nodes. Although most use cases are addressed with a single NodePool for multiple workloads/teams, multiple NodePools are useful to isolate nodes for billing, use different node constraints (such as no GPUs for a team), or use different disruption settings.
 
