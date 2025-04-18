@@ -2,6 +2,7 @@ provider "aws" {
   region = local.region
 }
 
+# Used for global services that only work in us-east-1 like ECR
 provider "aws" {
   region = "us-east-1"
   alias  = "virginia"

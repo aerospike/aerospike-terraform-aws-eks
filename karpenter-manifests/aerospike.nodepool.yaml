@@ -26,5 +26,5 @@ spec:
           operator: Gt
           values: ["4"]
   disruption:
-    consolidationPolicy: WhenEmptyOrUnderutilized
+    consolidationPolicy: WhenEmpty
     consolidateAfter: 1m
