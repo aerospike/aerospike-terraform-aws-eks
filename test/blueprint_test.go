@@ -15,8 +15,6 @@ import (
 func TestAerospikeBlueprint(t *testing.T) {
 	tfOptions := &terraform.Options{
 		TerraformDir: "../",
-		VarFiles:     []string{"../terraform.tfvars"},
-		NoColor:      true,
 	}
 
 	// awsRegion should be same as region in the .tfvars file
@@ -25,7 +23,7 @@ func TestAerospikeBlueprint(t *testing.T) {
 		"TF_VAR_aerospike_secret_files_path",
 		"AWS_DEFAULT_REGION",
 	}
-	SetEnvVars(t, envVars)
+	CheckEnvVars(t, envVars)
 
 	defer RunCleanupScript(t)
 	RunInstallScript(t)

@@ -22,7 +22,7 @@ Put your features.conf file and any additional cert files into a single director
 
 Then, set the following environment variables in your terminal:
 
-```
+```sh
 export TF_VAR_aerospike_admin_password=<password-for-admin-user>
 export TF_VAR_aerospike_secret_files_path=<absolute-path-to-directory-containing-features.conf-and-certs>
 ```
@@ -33,7 +33,7 @@ These environment variables are used by the blueprint to create two Kubernetes s
 ## Clone the Blueprint Repository
 To deploy this blueprint into an AWS EKS cluster, you first need to clone the repository. To do so, run these commands:
 
-```
+```sh
 git clone https://github.com/aerospike/aerospike-terraform-aws-eks.git
 cd aerospike-terraform-aws-eks
 ```
@@ -48,7 +48,7 @@ Here’s a [sample terraform.tfvars](terraform.tfvars.example) you can use as a 
 ## Run the Installation Script
 Make the install script executable and run it. Enter the region name when prompted (i.e. `eu-west-1`):
 
-```
+```sh
 chmod +x install.sh
 ./install.sh
 ```
@@ -58,7 +58,7 @@ The script will deploy all the resources using Terraform. The Terraform template
 ## Connecting to the EKS cluster
 To connect to your Aerospike EKS cluster using kubectl, run the following command:
 
-```
+```sh
 aws eks --region <your-region> update-kubeconfig --name <your-cluster-name>
 ```
 - Replace `<your-region>` with the region you deployed the cluster to (e.g., us-west-2).
@@ -68,13 +68,13 @@ aws eks --region <your-region> update-kubeconfig --name <your-cluster-name>
 
 To confirm that the Aerospike cluster has been created, check the status of the pods running this command:
 
-```
+```sh
 kubectl get pods -n aerospike
 ```
 
 You should see an output like this:
 
-```
+```sh
 NAME                   READY   STATUS    RESTARTS   AGE
 aerospikecluster-0-0   1/1     Running   0          20m
 aerospikecluster-0-1   1/1     Running   0          20m
@@ -83,7 +83,7 @@ aerospikecluster-0-2   1/1     Running   0          20m
 
 If the pods are crashing, check the logs of one of the pods by running this command:
 
-```
+```sh
 kubectl logs aerospikecluster-0-0 -c aerospike-server -n aerospike
 ```
 
@@ -91,7 +91,7 @@ kubectl logs aerospikecluster-0-0 -c aerospike-server -n aerospike
 
 Once the Aerospike cluster is running, let's make sure it's working. To do so, let's create some environment variables to get one of the Aerospike host IPs, the user, and the password to connect to the server. Run these commands:
 
-```
+```sh
 export HOST=$(kubectl get aerospikecluster aerospikecluster -n aerospike -o jsonpath='{.status.pods.aerospikecluster-0-0.aerospike.accessEndpoints[0]}')
 export USER=$(kubectl get aerospikecluster aerospikecluster -n aerospike -o jsonpath='{.status.aerospikeAccessControl.users[0].name}')
 export PASSWORD=$(kubectl get secret auth-secret -n aerospike -o jsonpath='{.data.password}' | base64 --decode)
@@ -99,7 +99,7 @@ export PASSWORD=$(kubectl get secret auth-secret -n aerospike -o jsonpath='{.dat
 
 Next, let's create a temporary pod that uses the Aerospike tools container, and connect to the cluster by running this command:
 
-```
+```sh
 kubectl run -it --rm --restart=Never aerospike-tool -n aerospike --image=aerospike/aerospike-tools:latest -- asadm -h $HOST -U $USER -P $PASSWORD
 ```
 
@@ -123,7 +123,7 @@ This blueprint uses Karpenter for dynamic provisioning of EKS compute nodes. Kar
 
 When the Aerospike cluster is created, there are unscheduled pods as none of the existing nodes have a label `NodeGroupType: aerospike`. Therefore, Karpenter will launch the node(s) needed based on the pod's constraints. In this case, if you look at the `examples/aerospike-cluster-values.yaml` file, the Aerospike pods have the following constraints:
 
-```
+```yaml
 podSpec:
   multiPodPerHost: false
   nodeSelector:
@@ -136,7 +136,7 @@ Notice that the pods are requesting a node with the `NodeGroupType` selector, wh
 
 In this case, the NodePools the blueprint is creating have the constraint to only use Graviton instances as they've been proven to provide a better performance to run Aerospike clusters. You don't need to build a different Aerospike container image for this as we already have support for arm-based container images. Here's a portion of the NodePool constraints that launch only Graviton instances for certain families:
 
-```
+```yaml
       requirements:
         - key: "kubernetes.io/arch"
           operator: In
@@ -153,7 +153,31 @@ In this case, the NodePools the blueprint is creating have the constraint to onl
 
 To cleanup the environment, simply run the following commands, this script uses Terraform with the `-target` option to ensure all the resources are deleted in correct order:
 
-```
+```sh
 chmod +x cleanup.sh
 ./cleanup.sh
 ```
+
+# Running the Aerospike Blueprint Test Suite
+## Prerequisite
+Blueprint test suite requires Go 1.23+
+
+## Set Required Environment Variables
+Before running tests, you must export the following environment variables. These are required for Terraform and Kubernetes provisioning:
+
+```sh
+export TF_VAR_aerospike_admin_password=<password-for-admin-user>
+export TF_VAR_aerospike_secret_files_path=<absolute-path-to-directory-containing-features.conf-and-certs>
+export AWS_DEFAULT_REGION=<aws_region_used_by_awscli>
+```
+
+## Run the Test Suite
+The test suite uses the default Terraform configuration from the project root. If a `terraform.tfvars` file is present, it will be picked up automatically by Terraform. You can modify this file to match your environment setup.
+
+To execute the test suite, navigate to the project root (aerospike-terraform-aws-eks/) and run:
+```sh
+go test -v -timeout 50m ./test
+```
+- -v: Enables verbose output
+- -timeout 50m: Increases test timeout (default is 10m, which might not be enough for infra setup)
+- ./test: Path to the test directory

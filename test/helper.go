@@ -26,8 +26,8 @@ const (
 	asFkAndCertSecret = "aerospike-secret"
 )
 
-// SetEnvVars sets multiple environment variables for the test.
-func SetEnvVars(t *testing.T, envVars []string) {
+// CheckEnvVars sets multiple environment variables for the test.
+func CheckEnvVars(t *testing.T, envVars []string) {
 	t.Helper()
 
 	for _, envVar := range envVars {
