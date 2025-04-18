@@ -1,38 +1,36 @@
 # --------------------------
-# AWS SETTINGS
+# AWS VARIABLES
 # --------------------------
 region = "us-west-1"
 
 # --------------------------
-# EKS SETTINGS
+# EKS VARIABLES
 # --------------------------
 name                  = "example-aerospike-on-eks"
 eks_cluster_version   = "1.31"
 enable_public_endpoint = true  # Set to false in production
 
 # --------------------------
-# VPC SETTINGS
+# VPC VARIABLES
 # --------------------------
 vpc_cidr             = "10.1.0.0/16"
-az_count             = 2
 enable_nat_gateway   = true
 
-# --------------------------
-# NODE POOL SETTINGS
-# --------------------------
+
+# -----------------------------------------------------------------------------------
+# CORE NODE GROUP VARIABLES (used for system/setup pods like Karpenter, CoreDNS, etc.)
+# NOTE: These nodes are NOT used for Aerospike or AKO pods — those are handled by Karpenter
+# -----------------------------------------------------------------------------------
 instance_types     = ["m6g.xlarge", "c6g.xlarge"]
-min_size           = 2
-max_size           = 6
 desired_size       = 3
-ebs_volume_type    = "gp3"
 ebs_volume_size    = 50
 
 # --------------------------
-# ADDONS
+# ADDONS VARIABLES
 # --------------------------
 karpenter_version = "1.1.0"
 
 # --------------------------
-# AEROSPIKE CONFIG
+# AEROSPIKE VARIABLES
 # --------------------------
 aerospike_operator_version = "4.0.0"

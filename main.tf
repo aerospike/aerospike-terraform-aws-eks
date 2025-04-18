@@ -34,7 +34,10 @@ locals {
 
   # Use the first 2 available AZs for subnet distribution
   vpc_cidr = var.vpc_cidr
-  azs      = slice(data.aws_availability_zones.available.names, 0, var.az_count)
+
+  # Default to 2 AZs if user does not provide availability_zones
+  az_count = 2
+  azs = length(var.availability_zones) > 0 ? var.availability_zones : slice(data.aws_availability_zones.available.names, 0, local.az_count)
 
   account_id = data.aws_caller_identity.current.account_id
   partition  = data.aws_partition.current.partition
@@ -98,8 +101,8 @@ module "eks" {
     core_node_group = {
       name = "core-node-group"
 
-      min_size     = var.min_size
-      max_size     = var.max_size
+      min_size     = 2
+      max_size     = 8
       desired_size = var.desired_size
 
       instance_types = var.instance_types
@@ -113,7 +116,7 @@ module "eks" {
           device_name = "/dev/xvda"
           ebs = {
             volume_size = var.ebs_volume_size
-            volume_type = var.ebs_volume_type
+            volume_type = "gp3"
           }
         }
       }

@@ -17,7 +17,7 @@ module "vpc" {
   public_subnets = [for k, v in local.azs : cidrsubnet(local.vpc_cidr, 8, k + 10)]
 
   # Enable NAT gateway (1 per region, not per AZ) to allow private subnet internet access
-  enable_nat_gateway = var.enable_nat_gateway
+  enable_nat_gateway = true
   single_nat_gateway = true
 
   # Tag public subnets to be discovered as ELB-compatible by Kubernetes

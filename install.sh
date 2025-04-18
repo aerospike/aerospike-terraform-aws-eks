@@ -1,7 +1,17 @@
 #!/bin/bash
 
-read -p "Enter the region: " region
-export AWS_DEFAULT_REGION=$region
+# Ensure script runs from project root (adjust if needed)
+cd "$(dirname "$0")"
+
+# Use existing environment variable if available, otherwise prompt the user
+region="${AWS_DEFAULT_REGION}"
+
+if [ -z "$region" ]; then
+  read -p "Enter the region: " region
+  export AWS_DEFAULT_REGION=$region
+else
+  echo "Using AWS region from environment: $region"
+fi
 
 # List of Terraform modules to apply in sequence
 targets=(

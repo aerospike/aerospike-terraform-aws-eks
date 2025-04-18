@@ -9,6 +9,13 @@ variable "region" {
   default     = "us-west-2"
 }
 
+# Optional variable: User-defined list of AZs
+variable "availability_zones" {
+  description = "Optional list of AZs to use for subnets, node groups, and aerospike rack config. If not set, 2 random AZs will be picked."
+  type        = list(string)
+  default     = []
+}
+
 # --------------------------
 # EKS VARIABLES
 # --------------------------
@@ -27,7 +34,7 @@ variable "eks_cluster_version" {
 
 # WARNING: Don't use public endpoint in production unless absolutely necessary
 variable "enable_public_endpoint" {
-  description = "Enable public endpoint for EKS cluster"
+  description = "Enable public endpoint for EKS cluster API server"
   type        = bool
   default     = false
 }
@@ -42,53 +49,20 @@ variable "vpc_cidr" {
   default     = "10.1.0.0/16"
 }
 
-variable "az_count" {
-  description = "Number of Azs for deploying nodes"
-  type        = number
-  default     = 2
-}
-
-# WARNING: This VPC includes internet and NAT gateways, which are ideal for sandbox/test environments.
-# For production use, consider a fully private architecture, and consult your cloud security team.
-variable "enable_nat_gateway" {
-  description = "Whether to enable NAT gateway"
-  type        = bool
-  default     = false
-}
-
-# --------------------------
-# NODE POOL VARIABLES
-# --------------------------
-
-# Allowed instance categories "c", "m", "r", "i"
+# -----------------------------------------------------------------------------------
+# CORE NODE GROUP VARIABLES (used for system/setup pods like Karpenter, CoreDNS, etc.)
+# NOTE: These nodes are NOT used for Aerospike or AKO pods — those are handled by Karpenter
+# -----------------------------------------------------------------------------------
 variable "instance_types" {
   description = "Instance types for EKS nodes"
   type        = list(string)
   default     = ["m8g.xlarge", "m7g.xlarge", "c8g.xlarge", "c7g.xlarge"]
 }
 
-variable "min_size" {
-  description = "Node group min size"
-  type        = number
-  default     = 3
-}
-
-variable "max_size" {
-  description = "Node group max size"
-  type        = number
-  default     = 9
-}
-
 variable "desired_size" {
   description = "Node group desired size"
   type        = number
   default     = 3
-}
-
-variable "ebs_volume_type" {
-  description = "Root Volume type"
-  type        = string
-  default     = "gp3"
 }
 
 variable "ebs_volume_size" {
