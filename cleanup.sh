@@ -1,17 +1,18 @@
 #!/bin/bash
+set -euo pipefail
 
 # Ensure script runs from project root (adjust if needed)
 cd "$(dirname "$0")"
 
-# Use existing environment variable if available, otherwise prompt the user
-region="${AWS_DEFAULT_REGION}"
+# Import common helpers
+source "env_var.sh"
 
-if [ -z "$region" ]; then
-  read -p "Enter the region: " region
-  export AWS_DEFAULT_REGION=$region
-else
-  echo "Using AWS region from environment: $region"
-fi
+# Verify if all the required environment variables are set
+check_required_env_vars
+
+# Assign AWS region after prompting
+region="${AWS_DEFAULT_REGION}"
+echo "AWS_DEFAULT_REGION set to: $region"
 
 # List of Terraform modules to apply in sequence
 targets=(
@@ -41,8 +42,8 @@ do
 done
 
 # Delete Karpenter resources
-kubectl delete --all nodeclaim
 kubectl delete --all nodepool
+kubectl delete --all nodeclaim
 kubectl delete --all ec2nodeclass
 
 # Destroy modules in sequence

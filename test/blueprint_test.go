@@ -50,11 +50,13 @@ func TestAerospikeBlueprint(t *testing.T) {
 
 	t.Run("TestKarpenterControllerPod", func(t *testing.T) {
 		filters := metav1.ListOptions{LabelSelector: karpenterLabel}
-		k8s.WaitUntilNumPodsCreated(t, karpenterOpts, filters, 2, retry, sleepBetweenRetries)
+		err := k8s.WaitUntilNumPodsCreatedE(t, karpenterOpts, filters, 2, retry, sleepBetweenRetries)
+		assert.NoError(t, err)
 
 		pods := k8s.ListPods(t, karpenterOpts, filters)
 		for _, pod := range pods {
-			k8s.WaitUntilPodAvailableE(t, karpenterOpts, pod.Name, retry, sleepBetweenRetries)
+			err := k8s.WaitUntilPodAvailableE(t, karpenterOpts, pod.Name, retry, sleepBetweenRetries)
+			assert.NoError(t, err)
 		}
 	})
 
@@ -73,11 +75,13 @@ func TestAerospikeBlueprint(t *testing.T) {
 	// If AKO and aerospike pods are running then it means karpenter is working fine
 	t.Run("TestAKOOperatorPod", func(t *testing.T) {
 		filters := metav1.ListOptions{LabelSelector: akoLabel}
-		k8s.WaitUntilNumPodsCreated(t, akoOpts, filters, 2, retry, sleepBetweenRetries)
+		err := k8s.WaitUntilNumPodsCreatedE(t, akoOpts, filters, 2, retry, sleepBetweenRetries)
+		assert.NoError(t, err)
 
 		pods := k8s.ListPods(t, akoOpts, filters)
 		for _, pod := range pods {
-			k8s.WaitUntilPodAvailableE(t, akoOpts, pod.Name, retry, sleepBetweenRetries)
+			err := k8s.WaitUntilPodAvailableE(t, akoOpts, pod.Name, retry, sleepBetweenRetries)
+			assert.NoError(t, err)
 		}
 	})
 
@@ -91,11 +95,13 @@ func TestAerospikeBlueprint(t *testing.T) {
 
 	t.Run("TestAerospikePodsRunning", func(t *testing.T) {
 		filters := metav1.ListOptions{LabelSelector: asClusterLabel}
-		k8s.WaitUntilNumPodsCreated(t, aerospikeOpts, filters, aeroClusterSz, retry, sleepBetweenRetries)
+		err := k8s.WaitUntilNumPodsCreatedE(t, aerospikeOpts, filters, aeroClusterSz, retry, sleepBetweenRetries)
+		assert.NoError(t, err)
 
 		pods := k8s.ListPods(t, aerospikeOpts, filters)
 		for _, pod := range pods {
-			k8s.WaitUntilPodAvailableE(t, aerospikeOpts, pod.Name, retry, sleepBetweenRetries)
+			err := k8s.WaitUntilPodAvailableE(t, aerospikeOpts, pod.Name, retry, sleepBetweenRetries)
+			assert.NoError(t, err)
 		}
 	})
 
@@ -121,10 +127,12 @@ func ScaleAerospikeCluster(t *testing.T, options *k8s.KubectlOptions, clusterNam
 
 	// Wait and verify cluster scaleup
 	filters := metav1.ListOptions{LabelSelector: asClusterLabel}
-	k8s.WaitUntilNumPodsCreated(t, options, filters, newSize, retry*2, sleepBetweenRetries)
+	err = k8s.WaitUntilNumPodsCreatedE(t, options, filters, newSize, retry*2, sleepBetweenRetries)
+	assert.NoError(t, err)
 
 	pods := k8s.ListPods(t, options, filters)
 	for _, pod := range pods {
-		k8s.WaitUntilPodAvailableE(t, options, pod.Name, retry, sleepBetweenRetries)
+		err := k8s.WaitUntilPodAvailableE(t, options, pod.Name, retry, sleepBetweenRetries)
+		assert.NoError(t, err)
 	}
 }

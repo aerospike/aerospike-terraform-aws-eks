@@ -39,11 +39,16 @@ cd aerospike-terraform-aws-eks
 ```
 
 ## Customizing the Blueprint Configuration (Optional)
-You can customize this blueprint by providing your own values in a `terraform.tfvars` file placed in the root of the repository.
+This blueprint exposes several configurable variables such as deployment `region`, EKS Cluster `name`, `availability_zones`, `eks_cluster_version`, `aerospike_operator_version`, and more to help tailor the deployment to your environment. All configurable options are defined in the [variables.tf](variables.tf) file.
 
-Terraform will automatically pick up this file when you run the `install.sh` script, no extra configuration is needed.
+To override the default values, you can create a `terraform.tfvars` file in the root of the repository. Terraform will automatically use this file when running install.sh, no additional flags or changes are required.
 
-Here’s a [sample terraform.tfvars](terraform.tfvars.example) you can use as a starting point. Rename this file to `terraform.tfvars` and update values before running the install script.
+A [sample terraform.tfvars](terraform.tfvars.example) file is provided as a reference. You can start by copying it:
+
+```sh
+cp terraform.tfvars.example terraform.tfvars
+```
+Then modify the values to suit your environment and preferences.
 
 ## Run the Installation Script
 Make the install script executable and run it. Enter the region name when prompted (i.e. `eu-west-1`):
