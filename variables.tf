@@ -38,7 +38,7 @@ variable "eks_cluster_version" {
 variable "enable_public_endpoint" {
   description = "Enable public endpoint access for the EKS API server. WARNING: Not recommended for production environments."
   type        = bool
-  default     = false
+  default     = true
 }
 
 # --------------------------
