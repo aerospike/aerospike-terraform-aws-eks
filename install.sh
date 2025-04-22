@@ -1,7 +1,18 @@
 #!/bin/bash
+set -euo pipefail
 
-read -p "Enter the region: " region
-export AWS_DEFAULT_REGION=$region
+# Ensure script runs from project root (adjust if needed)
+cd "$(dirname "$0")"
+
+# Import common helpers
+source "env_var.sh"
+
+# Verify if all the required environment variables are set
+check_required_env_vars
+
+# Assign AWS region after prompting
+region="${AWS_DEFAULT_REGION}"
+echo "AWS_DEFAULT_REGION set to: $region"
 
 # List of Terraform modules to apply in sequence
 targets=(
