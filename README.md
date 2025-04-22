@@ -4,7 +4,7 @@ Aerospike is a high-performance, scalable, real-time NoSQL database designed for
 
 This repository provides a Terraform-based blueprint for deploying Aerospike Database Enterprise Edition on Amazon Elastic Kubernetes Service (EKS). It follows the conventions of the Data on EKS (DoEKS) project, combining Kubernetes orchestration with Terraform’s infrastructure-as-code approach for scalable, cloud-native deployments.
 
-The blueprint includes configuration for Aerospike clustering, storage optimization, networking, and security—enabling a production-ready deployment on AWS in under 30 minutes.
+The blueprint includes configuration for Aerospike clustering, storage optimization, networking, and security—enabling a deployment on AWS in under 30 minutes.
 
 # Prerequisites
 
