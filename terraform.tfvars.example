@@ -7,7 +7,7 @@ region = "us-west-1"
 # EKS VARIABLES
 # --------------------------
 name                  = "example-aerospike-on-eks"
-eks_cluster_version   = "1.31"
+eks_cluster_version   = "1.33"
 enable_public_endpoint = true  # Set to false in production
 
 # --------------------------

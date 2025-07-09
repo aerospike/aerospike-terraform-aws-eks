@@ -32,7 +32,7 @@ variable "name" {
 variable "eks_cluster_version" {
   description = "Version of the EKS cluster to deploy."
   type        = string
-  default     = "1.31"
+  default     = "1.33"
 }
 
 variable "enable_public_endpoint" {
