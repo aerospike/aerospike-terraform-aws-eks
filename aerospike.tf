@@ -82,7 +82,7 @@ locals {
   }
 }
 
-resource "kubernetes_namespace" "aerospike" {
+resource "kubernetes_namespace_v1" "aerospike" {
   metadata {
     name = local.aerospike_namespace
   }
@@ -91,7 +91,7 @@ resource "kubernetes_namespace" "aerospike" {
 }
 
 # Create the ServiceAccount
-resource "kubernetes_service_account" "aerospike_operator_controller_manager" {
+resource "kubernetes_service_account_v1" "aerospike_operator_controller_manager" {
   metadata {
     name      = "aerospike-operator-controller-manager"
     namespace = local.aerospike_namespace
@@ -99,7 +99,7 @@ resource "kubernetes_service_account" "aerospike_operator_controller_manager" {
 }
 
 # Create the RoleBinding
-resource "kubernetes_role_binding" "aerospike_cluster" {
+resource "kubernetes_role_binding_v1" "aerospike_cluster" {
   metadata {
     name      = "aerospike-cluster"
     namespace = local.aerospike_namespace
@@ -113,13 +113,13 @@ resource "kubernetes_role_binding" "aerospike_cluster" {
 
   subject {
     kind      = "ServiceAccount"
-    name      = kubernetes_service_account.aerospike_operator_controller_manager.metadata[0].name
+    name      = kubernetes_service_account_v1.aerospike_operator_controller_manager.metadata[0].name
     namespace = local.aerospike_namespace
   }
 }
 
 # Create the ClusterRoleBinding
-resource "kubernetes_cluster_role_binding" "aerospike_cluster" {
+resource "kubernetes_cluster_role_binding_v1" "aerospike_cluster" {
   metadata {
     name = "aerospike-cluster"
   }
@@ -132,12 +132,12 @@ resource "kubernetes_cluster_role_binding" "aerospike_cluster" {
 
   subject {
     kind      = "ServiceAccount"
-    name      = kubernetes_service_account.aerospike_operator_controller_manager.metadata[0].name
+    name      = kubernetes_service_account_v1.aerospike_operator_controller_manager.metadata[0].name
     namespace = local.aerospike_namespace
   }
 }
 
-resource "kubernetes_secret" "auth_secret" {
+resource "kubernetes_secret_v1" "auth_secret" {
   metadata {
     name      = "auth-secret"
     namespace = local.aerospike_namespace
@@ -152,7 +152,7 @@ resource "kubernetes_secret" "auth_secret" {
   depends_on = [helm_release.aerospike_operator]
 }
 
-resource "kubernetes_secret" "aerospike_secret" {
+resource "kubernetes_secret_v1" "aerospike_secret" {
   metadata {
     name      = "aerospike-secret"
     namespace = local.aerospike_namespace
@@ -228,7 +228,7 @@ resource "helm_release" "aerospike_cluster" {
   }
 
   depends_on = [
-    kubernetes_secret.auth_secret,
+    kubernetes_secret_v1.auth_secret,
     helm_release.aerospike_operator
   ]
 }

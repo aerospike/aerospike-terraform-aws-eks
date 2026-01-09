@@ -32,7 +32,7 @@ variable "name" {
 variable "eks_cluster_version" {
   description = "Version of the EKS cluster to deploy."
   type        = string
-  default     = "1.31"
+  default     = "1.33"
 }
 
 variable "enable_public_endpoint" {
@@ -81,7 +81,7 @@ variable "ebs_volume_size" {
 variable "karpenter_version" {
   description = "Version of the Karpenter add-on."
   type        = string
-  default     = "1.1.0"
+  default     = "1.5.0"
 }
 
 # --------------------------

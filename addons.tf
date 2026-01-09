@@ -20,7 +20,7 @@ resource "kubernetes_annotations" "gp2_default" {
 
 # This creates a new "gp3" StorageClass.
 # It is also marked as the default StorageClass in the cluster.
-resource "kubernetes_storage_class" "ebs_csi_encrypted_gp3_storage_class" {
+resource "kubernetes_storage_class_v1" "ebs_csi_encrypted_gp3_storage_class" {
   metadata {
     name = "gp3"
     annotations = {
